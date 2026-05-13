@@ -55,6 +55,11 @@ export default function Apply() {
       })
   }, [])
 
+  useEffect(() => {
+    if (!result) return
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }, [result])
+
   const stepTitle = useMemo(() => STEPS[step], [step])
 
   function updateField(field, value) {
@@ -139,6 +144,76 @@ export default function Apply() {
     setStep((current) => Math.max(current - 1, 0))
   }
 
+  function resetApplicationFlow() {
+    setResult(null)
+    setApiError('')
+    setErrors({})
+    setUploading({})
+  }
+
+  if (result) {
+    const applicantName = `${result.first_name || ''} ${result.surname || ''}`.trim()
+    const submittedOn = result.created_at
+      ? new Date(result.created_at).toLocaleString('en-ZA', {
+          dateStyle: 'medium',
+          timeStyle: 'short',
+        })
+      : 'Saved successfully'
+
+    return (
+      <div className="shell">
+        <div className="container">
+          <div className="header">
+            <div>
+              <div className="brand-kicker">Lombicor Recruitment</div>
+              <h1>Application submitted</h1>
+              <p className="muted">Your application is on the system. Keep the reference ticket below for any follow-up.</p>
+            </div>
+          </div>
+
+          <div className="confirmation-screen">
+            <div className="hero-card confirmation-card stack">
+              <div>
+                <div className="brand-kicker">Final confirmation</div>
+                <h2 className="confirmation-title">Reference ticket saved</h2>
+                <p className="muted confirmation-copy">
+                  This reference number is the main proof that your submission was received.
+                </p>
+              </div>
+
+              <div className="reference-ticket">
+                <div className="muted small">Reference number</div>
+                <div className="reference-code">{result.ref_id}</div>
+                <p className="reference-help">
+                  Quote this number when contacting Lombicor about your application.
+                </p>
+              </div>
+
+              <div className="grid three confirmation-meta">
+                <SummaryCard label="Applicant" value={applicantName || 'Application received'} />
+                <SummaryCard label="Current status" value={result.status || 'new'} />
+                <SummaryCard label="Submitted" value={submittedOn} />
+              </div>
+
+              <div className="notice success confirmation-notice">
+                <strong>What happens next?</strong>
+                <p className="muted" style={{ marginBottom: 0 }}>
+                  The admin team can now review your details, documents, and placement readiness using this reference ticket.
+                </p>
+              </div>
+
+              <div className="actions">
+                <button className="btn btn-primary" type="button" onClick={resetApplicationFlow}>
+                  Submit another application
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="shell">
       <div className="container">
@@ -163,13 +238,6 @@ export default function Apply() {
             <p className="muted small">Fill in each section carefully. The admin team will use these details for review and placement.</p>
           </div>
         </div>
-
-        {result && (
-          <div className="notice success" style={{ marginBottom: '1rem' }}>
-            <strong>Application submitted.</strong>
-            <p className="muted" style={{ marginBottom: 0 }}>Reference: {result.ref_id}. Keep this safe.</p>
-          </div>
-        )}
 
         {apiError && (
           <div className="notice" style={{ marginBottom: '1rem' }}>
@@ -313,7 +381,7 @@ export default function Apply() {
                       if (file) handleUpload(field, file)
                     }}
                   />
-                  {uploading[field] && <div className="muted small">Uploading…</div>}
+                  {uploading[field] && <div className="muted small">Uploading...</div>}
                   {form[field] && <a href={form[field]} target="_blank" rel="noreferrer">View uploaded file</a>}
                 </div>
               ))}
@@ -340,7 +408,7 @@ export default function Apply() {
             {step < STEPS.length - 1 && <button className="btn btn-primary" type="button" onClick={nextStep}>Next</button>}
             {step === STEPS.length - 1 && (
               <button className="btn btn-primary" type="button" disabled={submitting} onClick={handleSubmit}>
-                {submitting ? 'Submitting…' : 'Submit application'}
+                {submitting ? 'Submitting...' : 'Submit application'}
               </button>
             )}
           </div>
