@@ -15,10 +15,29 @@ const upload = multer({
 
 const PORT = Number(process.env.PORT || 3000)
 const ADMIN_PIN = process.env.ADMIN_PIN || '2026'
-const SUPABASE_URL = process.env.SUPABASE_URL || ''
-const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || ''
+const SUPABASE_URL = String(process.env.SUPABASE_URL || '').trim()
+const SUPABASE_SERVICE_ROLE_KEY = String(process.env.SUPABASE_SERVICE_ROLE_KEY || '').trim()
 const SUPABASE_STORAGE_BUCKET = process.env.SUPABASE_STORAGE_BUCKET || 'applicant-docs'
-const HAS_SUPABASE = Boolean(SUPABASE_URL && SUPABASE_SERVICE_ROLE_KEY)
+
+function isValidHttpUrl(value) {
+  if (!value) return false
+  try {
+    const url = new URL(value)
+    return url.protocol === 'http:' || url.protocol === 'https:'
+  } catch {
+    return false
+  }
+}
+
+const SUPABASE_CONFIG_ERROR = !SUPABASE_URL
+  ? 'Supabase URL is missing.'
+  : !isValidHttpUrl(SUPABASE_URL)
+    ? 'Supabase URL must be a valid http or https URL.'
+    : !SUPABASE_SERVICE_ROLE_KEY
+      ? 'Supabase service role key is missing.'
+      : ''
+
+const HAS_SUPABASE = !SUPABASE_CONFIG_ERROR
 const supabase = HAS_SUPABASE
   ? createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
       auth: { autoRefreshToken: false, persistSession: false },
@@ -36,7 +55,7 @@ app.use(express.urlencoded({ extended: true }))
 function requireSupabase(res) {
   if (!supabase) {
     res.status(500).json({
-      error: 'Supabase is not configured yet. Fill in SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY first.',
+      error: SUPABASE_CONFIG_ERROR || 'Supabase is not configured yet. Fill in SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY first.',
     })
     return false
   }
@@ -126,6 +145,7 @@ app.get('/api/health', (_req, res) => {
     status: 'ok',
     service: 'lombicor-recruitment',
     supabaseConfigured: HAS_SUPABASE,
+    supabaseConfigError: SUPABASE_CONFIG_ERROR || null,
   })
 })
 
