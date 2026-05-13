@@ -323,16 +323,240 @@ p {
   font-size: 0.92rem;
 }
 
+
+.admin-shell {
+  padding-bottom: 2rem;
+}
+
+.admin-toolbar {
+  position: relative;
+  overflow: hidden;
+}
+
+.admin-toolbar::before,
+.admin-detail-panel::before,
+.admin-list-panel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(135deg, rgba(230, 126, 34, 0.08), transparent 38%, rgba(192, 57, 43, 0.08));
+}
+
+.admin-toolbar-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.65fr) repeat(4, minmax(160px, 1fr));
+  gap: 0.9rem;
+  align-items: end;
+  position: relative;
+  z-index: 1;
+}
+
+.admin-search-block {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.admin-search-input {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(230, 126, 34, 0.25);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+.admin-search-input:focus,
+select:focus,
+textarea:focus,
+input:focus {
+  outline: none;
+  border-color: rgba(230, 126, 34, 0.78);
+  box-shadow: 0 0 0 3px rgba(230, 126, 34, 0.14);
+}
+
+.admin-toolbar-footer {
+  position: relative;
+  z-index: 1;
+  margin-top: 1rem;
+  display: flex;
+  gap: 0.9rem;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.admin-filter-summary {
+  gap: 0.6rem;
+}
+
+.admin-quick-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  align-items: center;
+}
+
+.tag-button {
+  background: rgba(255, 255, 255, 0.03);
+  transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+}
+
+.tag-button:hover,
+.tag-button:focus-visible {
+  border-color: rgba(230, 126, 34, 0.6);
+  color: var(--text);
+  background: rgba(230, 126, 34, 0.12);
+  transform: translateY(-1px);
+}
+
+.btn-small {
+  padding: 0.6rem 0.9rem;
+  font-size: 0.88rem;
+}
+
+.admin-columns {
+  align-items: start;
+}
+
+.admin-list-panel,
+.admin-detail-panel,
+.admin-hero,
+.summary-panel,
+.document-card,
+.stat-card,
+.list-item {
+  position: relative;
+}
+
+.admin-list-panel {
+  gap: 1rem;
+}
+
+.admin-list-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  align-items: flex-start;
+}
+
+.admin-list-item {
+  width: 100%;
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.admin-list-item:hover {
+  transform: translateY(-2px);
+  border-color: rgba(230, 126, 34, 0.45);
+  background: linear-gradient(180deg, rgba(52, 18, 13, 0.98), rgba(31, 11, 9, 0.98));
+}
+
+.list-item-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  align-items: flex-start;
+  margin-bottom: 0.45rem;
+}
+
+.list-meta {
+  color: var(--muted);
+  font-size: 0.92rem;
+  margin-top: 0.3rem;
+}
+
+.list-tag-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.85rem;
+}
+
+.admin-detail-panel {
+  gap: 1rem;
+}
+
+.admin-hero {
+  padding: 1.35rem;
+  border-color: rgba(230, 126, 34, 0.22);
+}
+
+.admin-hero-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.summary-strip {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.mini-stat,
+.document-card,
+.detail-row {
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 16px;
+  padding: 0.9rem 1rem;
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.mini-stat strong {
+  display: block;
+  margin-top: 0.35rem;
+  font-size: 0.98rem;
+}
+
+.admin-detail-grid {
+  align-items: start;
+}
+
+.summary-panel h3 {
+  margin-bottom: 0.85rem;
+}
+
+.detail-row {
+  display: grid;
+  gap: 0.28rem;
+}
+
+.document-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.document-card a {
+  display: inline-flex;
+  margin-top: 0.35rem;
+  color: var(--secondary);
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.document-card a:hover {
+  color: #f0a04d;
+}
+
+@media (max-width: 1100px) {
+  .admin-toolbar-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 @media (max-width: 900px) {
   .grid.two,
   .grid.three,
   .columns,
   .stats,
-  .detail-grid {
+  .detail-grid,
+  .summary-strip,
+  .document-grid,
+  .admin-toolbar-grid {
     grid-template-columns: 1fr;
   }
 
-  .header {
+  .header,
+  .admin-hero-top,
+  .admin-toolbar-footer {
     flex-direction: column;
     align-items: flex-start;
   }
