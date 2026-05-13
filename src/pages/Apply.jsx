@@ -148,9 +148,6 @@ export default function Apply() {
             <h1>Apply for seasonal work</h1>
             <p className="muted">Complete the form, upload your documents, and keep your SA ID unique on the system.</p>
           </div>
-          <div className="actions">
-            <a className="btn btn-ghost" href="/admin-login">Admin access</a>
-          </div>
         </div>
 
         <div className="hero-card stack" style={{ marginBottom: '1rem' }}>

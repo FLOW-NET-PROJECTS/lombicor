@@ -24,6 +24,6 @@ Before first deploy:
 
 ## 5. Admin access
 Once deployed:
-- open `/admin-login`
+- open `/admin`
 - enter the PIN from `ADMIN_PIN`
-- then continue into `/admin`
+- then continue into the dashboard

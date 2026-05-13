@@ -80,7 +80,7 @@ export default function Admin() {
 
   function handleLogout() {
     window.localStorage.removeItem('lombicor-admin-unlocked')
-    navigate('/admin-login', { replace: true })
+    navigate('/admin', { replace: true })
   }
 
   return (

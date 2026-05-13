@@ -70,4 +70,4 @@ Add these Railway variables:
 Do not set `PORT` manually on Railway.
 
 ## Admin access
-Open `/admin-login` and enter the PIN from `ADMIN_PIN`.
+Open `/admin` and enter the PIN from `ADMIN_PIN`.
