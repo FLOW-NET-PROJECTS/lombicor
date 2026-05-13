@@ -15,7 +15,8 @@ export default function AdminGate() {
     try {
       await unlockAdmin(pin)
       window.localStorage.setItem('lombicor-admin-unlocked', 'true')
-      navigate('/admin', { replace: true })
+      window.location.replace('/admin')
+      return
     } catch (requestError) {
       setError(requestError.message)
     } finally {
