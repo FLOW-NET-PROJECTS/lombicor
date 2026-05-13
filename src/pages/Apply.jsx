@@ -2,6 +2,32 @@ import { useEffect, useMemo, useState } from 'react'
 import { getOptions, submitApplication, uploadDocument } from '../lib/api'
 
 const STEPS = ['Personal', 'Work', 'Documents', 'Review']
+const STEP_DETAILS = [
+  {
+    eyebrow: 'Step 1 of 4',
+    title: 'Personal details',
+    description: 'Share your identity, contact details, and area so the team can review your application correctly.',
+    caption: 'Identity and contact',
+  },
+  {
+    eyebrow: 'Step 2 of 4',
+    title: 'Work profile',
+    description: 'Select the work categories you fit best and add any experience that helps with placement.',
+    caption: 'Skills and readiness',
+  },
+  {
+    eyebrow: 'Step 3 of 4',
+    title: 'Documents',
+    description: 'Upload the files the team may need during screening so your application is easier to process.',
+    caption: 'Files and proof',
+  },
+  {
+    eyebrow: 'Step 4 of 4',
+    title: 'Review and submit',
+    description: 'Check the key details one last time, then submit your application and save your reference ticket.',
+    caption: 'Final check',
+  },
+]
 
 const initialForm = {
   first_name: '',
@@ -60,7 +86,67 @@ export default function Apply() {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }, [result])
 
-  const stepTitle = useMemo(() => STEPS[step], [step])
+  const stepMeta = useMemo(() => STEP_DETAILS[step], [step])
+  const progressValue = useMemo(() => Math.round(((step + 1) / STEPS.length) * 100), [step])
+  const uploadedCount = useMemo(
+    () => documentFields.filter(([field]) => Boolean(form[field])).length,
+    [form],
+  )
+  const stepAsideItems = useMemo(() => {
+    if (step === 0) {
+      return [
+        {
+          label: 'Identity check',
+          value: 'Use your legal names, current cellphone number, and one unique SA ID.',
+        },
+        {
+          label: 'Area selected',
+          value: form.area === 'Other' ? form.area_other || 'Other' : form.area || 'Choose your area',
+        },
+      ]
+    }
+
+    if (step === 1) {
+      const experience = [form.packhouse_experience && 'Packhouse', form.forklift_licence && 'Forklift']
+        .filter(Boolean)
+        .join(' + ')
+
+      return [
+        {
+          label: 'Skills chosen',
+          value: form.skills.length ? `${form.skills.length} selected` : 'Select at least one role',
+        },
+        {
+          label: 'Experience flags',
+          value: experience || 'No extra experience selected yet',
+        },
+      ]
+    }
+
+    if (step === 2) {
+      return [
+        {
+          label: 'Upload status',
+          value: `${uploadedCount} of ${documentFields.length} files uploaded`,
+        },
+        {
+          label: 'Accepted files',
+          value: 'PDF, JPG, or PNG up to 5MB per document',
+        },
+      ]
+    }
+
+    return [
+      {
+        label: 'Applicant',
+        value: `${form.first_name} ${form.surname}`.trim() || 'Finish your details before sending',
+      },
+      {
+        label: 'Duplicate rule',
+        value: 'Submitting blocks another application with the same SA ID.',
+      },
+    ]
+  }, [form, step, uploadedCount])
 
   function updateField(field, value) {
     setForm((current) => ({ ...current, [field]: value }))
@@ -161,9 +247,9 @@ export default function Apply() {
       : 'Saved successfully'
 
     return (
-      <div className="shell">
-        <div className="container">
-          <div className="header">
+      <div className="shell apply-shell">
+        <div className="container apply-page">
+          <div className="apply-header apply-confirmation-header">
             <div>
               <div className="brand-kicker">Lombicor Recruitment</div>
               <h1>Application submitted</h1>
@@ -215,40 +301,108 @@ export default function Apply() {
   }
 
   return (
-    <div className="shell">
-      <div className="container">
-        <div className="header">
-          <div>
-            <div className="brand-kicker">Lombicor Recruitment</div>
-            <h1>Apply for seasonal work</h1>
-            <p className="muted">Complete the form, upload your documents, and keep your SA ID unique on the system.</p>
-          </div>
+    <div className="shell apply-shell">
+      <div className="container apply-page">
+        <div className="apply-header">
+          <section className="hero-card apply-hero">
+            <div className="apply-hero-grid">
+              <div className="apply-hero-copy">
+                <div className="brand-kicker">Lombicor Recruitment</div>
+                <h1>Apply for seasonal work</h1>
+                <p className="apply-lead muted">Complete the form, upload your documents, and keep your SA ID unique on the system.</p>
+                <div className="apply-hero-badges">
+                  <span className="hero-badge">4 guided steps</span>
+                  <span className="hero-badge">Reference ticket on submit</span>
+                  <span className="hero-badge">Document upload ready</span>
+                </div>
+              </div>
+
+              <div className="apply-side-card">
+                <div className="brand-kicker">Before you begin</div>
+                <div className="apply-side-list">
+                  <div className="apply-side-item">
+                    <strong>Keep your details exact.</strong>
+                    <div className="muted small">The review team uses this information for screening and placement.</div>
+                  </div>
+                  <div className="apply-side-item">
+                    <strong>Prepare your documents.</strong>
+                    <div className="muted small">Have PDFs or images ready so uploads take less time.</div>
+                  </div>
+                  <div className="apply-side-item">
+                    <strong>Use one SA ID only.</strong>
+                    <div className="muted small">Duplicate applications for the same SA ID are blocked after submission.</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
         </div>
 
-        <div className="hero-card stack" style={{ marginBottom: '1rem' }}>
-          <div className="step-row">
-            {STEPS.map((label, index) => (
-              <span key={label} className={`step-pill ${index === step ? 'active' : ''}`}>
-                {index + 1}. {label}
-              </span>
-            ))}
+        <div className="hero-card apply-progress-card stack">
+          <div className="progress-top">
+            <div>
+              <div className="brand-kicker">{stepMeta.eyebrow}</div>
+              <h2>{stepMeta.title}</h2>
+              <p className="muted apply-step-copy">{stepMeta.description}</p>
+            </div>
+
+            <div className="progress-meter">
+              <div className="progress-meter-top">
+                <span className="muted small">Application progress</span>
+                <strong>{progressValue}%</strong>
+              </div>
+              <div className="progress-track" aria-hidden="true">
+                <span className="progress-value" style={{ width: `${progressValue}%` }} />
+              </div>
+            </div>
           </div>
-          <div>
-            <h2 style={{ marginBottom: '0.35rem' }}>{stepTitle}</h2>
-            <p className="muted small">Fill in each section carefully. The admin team will use these details for review and placement.</p>
+
+          <div className="apply-stepper">
+            {STEPS.map((label, index) => (
+              <div
+                key={label}
+                className={`apply-step ${index === step ? 'active' : ''} ${index < step ? 'complete' : ''}`.trim()}
+              >
+                <span className="apply-step-number">{index + 1}</span>
+                <div className="apply-step-body">
+                  <strong>{label}</strong>
+                  <span className="muted small">{STEP_DETAILS[index].caption}</span>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
 
         {apiError && (
-          <div className="notice" style={{ marginBottom: '1rem' }}>
+          <div className="notice apply-notice">
             <strong>Something needs attention.</strong>
             <p className="muted" style={{ marginBottom: 0 }}>{apiError}</p>
           </div>
         )}
 
-        <div className="panel stack" style={{ marginBottom: '2rem' }}>
+        <div className="panel stack apply-form-panel">
+          <div className="apply-section-head">
+            <div>
+              <div className="brand-kicker">{stepMeta.eyebrow}</div>
+              <h2 className="apply-section-title">{stepMeta.title}</h2>
+              <p className="muted apply-section-copy">{stepMeta.description}</p>
+            </div>
+
+            <div className="section-rail-card">
+              <div className="brand-kicker">Application pulse</div>
+              <div className="stack">
+                {stepAsideItems.map((item) => (
+                  <div key={item.label} className="apply-aside-row">
+                    <div className="muted small">{item.label}</div>
+                    <strong>{item.value}</strong>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
           {step === 0 && (
-            <div className="grid two">
+            <div className="grid two form-grid">
               <Field label="First name" error={errors.first_name}>
                 <input value={form.first_name} onChange={(event) => updateField('first_name', event.target.value)} />
               </Field>
@@ -295,7 +449,7 @@ export default function Apply() {
                   <input value={form.area_other} onChange={(event) => updateField('area_other', event.target.value)} />
                 </Field>
               )}
-              <Field label="Address notes (optional)" error={errors.address_notes}>
+              <Field label="Address notes (optional)" error={errors.address_notes} className="field-span-full">
                 <textarea value={form.address_notes} onChange={(event) => updateField('address_notes', event.target.value)} placeholder="Street, section, landmark, or pickup note" />
               </Field>
             </div>
@@ -307,7 +461,7 @@ export default function Apply() {
                 <label className="form-label">Skills / role choice</label>
                 <div className="grid two">
                   {options.skills.map((skill) => (
-                    <label key={skill} className="checkbox-card">
+                    <label key={skill} className={`checkbox-card ${form.skills.includes(skill) ? 'checked' : ''}`.trim()}>
                       <input
                         type="checkbox"
                         checked={form.skills.includes(skill)}
@@ -330,7 +484,7 @@ export default function Apply() {
               )}
 
               <div className="grid two">
-                <label className="checkbox-card">
+                <label className={`checkbox-card ${form.packhouse_experience ? 'checked' : ''}`.trim()}>
                   <input
                     type="checkbox"
                     checked={form.packhouse_experience}
@@ -341,7 +495,7 @@ export default function Apply() {
                     <div className="muted small">Tick this if you have worked in a packhouse before.</div>
                   </div>
                 </label>
-                <label className="checkbox-card">
+                <label className={`checkbox-card ${form.forklift_licence ? 'checked' : ''}`.trim()}>
                   <input
                     type="checkbox"
                     checked={form.forklift_licence}
@@ -368,10 +522,15 @@ export default function Apply() {
           {step === 2 && (
             <div className="grid two">
               {documentFields.map(([field, label]) => (
-                <div key={field} className="upload-box stack">
-                  <div>
-                    <strong>{label}</strong>
-                    <div className="muted small">PDF, JPG, or PNG up to 5MB.</div>
+                <div key={field} className={`upload-box stack ${form[field] ? 'uploaded' : ''}`.trim()}>
+                  <div className="upload-header">
+                    <div>
+                      <strong>{label}</strong>
+                      <div className="muted small">PDF, JPG, or PNG up to 5MB.</div>
+                    </div>
+                    <span className={`upload-status ${form[field] ? 'ready' : ''}`.trim()}>
+                      {form[field] ? 'Uploaded' : 'Not uploaded'}
+                    </span>
                   </div>
                   <input
                     type="file"
@@ -382,7 +541,7 @@ export default function Apply() {
                     }}
                   />
                   {uploading[field] && <div className="muted small">Uploading...</div>}
-                  {form[field] && <a href={form[field]} target="_blank" rel="noreferrer">View uploaded file</a>}
+                  {form[field] && <a className="upload-link" href={form[field]} target="_blank" rel="noreferrer">View uploaded file</a>}
                 </div>
               ))}
             </div>
@@ -390,7 +549,7 @@ export default function Apply() {
 
           {step === 3 && (
             <div className="stack">
-              <div className="grid two">
+              <div className="grid two apply-review-grid">
                 <SummaryCard label="Applicant" value={`${form.first_name} ${form.surname}`.trim() || 'Not filled'} />
                 <SummaryCard label="SA ID" value={form.id_number || 'Not filled'} />
                 <SummaryCard label="Area" value={form.area === 'Other' ? form.area_other || 'Other' : form.area || 'Not filled'} />
@@ -403,7 +562,7 @@ export default function Apply() {
             </div>
           )}
 
-          <div className="actions">
+          <div className="actions apply-actions">
             {step > 0 && <button className="btn btn-secondary" type="button" onClick={previousStep}>Back</button>}
             {step < STEPS.length - 1 && <button className="btn btn-primary" type="button" onClick={nextStep}>Next</button>}
             {step === STEPS.length - 1 && (
@@ -418,9 +577,9 @@ export default function Apply() {
   )
 }
 
-function Field({ label, error, children }) {
+function Field({ label, error, children, className = '' }) {
   return (
-    <div className="form-card">
+    <div className={`form-card ${className}`.trim()}>
       <label className="form-label">{label}</label>
       {children}
       {error && <div className="field-error">{error}</div>}
@@ -430,7 +589,7 @@ function Field({ label, error, children }) {
 
 function SummaryCard({ label, value }) {
   return (
-    <div className="panel">
+    <div className="panel summary-card">
       <div className="muted small">{label}</div>
       <strong>{value}</strong>
     </div>
