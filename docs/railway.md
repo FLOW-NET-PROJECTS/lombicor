@@ -7,7 +7,7 @@ Set these in Railway:
 - `SUPABASE_STORAGE_BUCKET` (default: `applicant-docs`)
 - `ADMIN_PIN`
 
-Do **not** set `PORT` manually. Railway injects it.
+Do **not** set `PORT` manually. Railway injects it, and the app already reads that injected value automatically.
 
 ## 2. Build and start
 - Build: `npm run build`

@@ -24,7 +24,6 @@ Full-stack recruitment portal for Railway deployment with:
 Copy `.env.example` to `.env` and fill in:
 
 ```bash
-PORT=3000
 SUPABASE_URL=
 SUPABASE_SERVICE_ROLE_KEY=
 SUPABASE_STORAGE_BUCKET=applicant-docs
@@ -35,6 +34,7 @@ VITE_API_BASE_URL=
 Notes:
 - Leave `VITE_API_BASE_URL` empty for Railway same-origin hosting.
 - Do not commit your real `.env` file.
+- Do not add `PORT` to `.env` on Railway. The app already uses Railway's injected `PORT`, and locally it falls back to `3000` automatically.
 
 ## Local run
 ```bash
