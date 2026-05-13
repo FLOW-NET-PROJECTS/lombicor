@@ -3,6 +3,9 @@
   "private": true,
   "version": "1.1.0",
   "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "dev": "concurrently \"node --watch server.js\" \"vite\"",
     "build": "vite build",
