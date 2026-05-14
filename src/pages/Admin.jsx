@@ -208,7 +208,7 @@ export default function Admin() {
   return (
     <div className="shell admin-shell">
       <div className="container">
-        <div className="header">
+        <div className="header admin-header">
           <div>
             <div className="brand-kicker">Lombicor Admin</div>
             <h1>Applications dashboard</h1>
@@ -227,7 +227,7 @@ export default function Admin() {
           </div>
         )}
 
-        <div className="stats" style={{ marginBottom: '1rem' }}>
+        <div className="stats admin-stats" style={{ marginBottom: '1rem' }}>
           <StatCard label="Total" value={stats.total} />
           <StatCard label="Showing" value={stats.filtered} />
           <StatCard label="New" value={stats.new} />
@@ -381,10 +381,10 @@ export default function Admin() {
                         <span className="admin-row-cell" data-label="Contact">{applicant.contact_number || '—'}</span>
                         <span className="admin-row-cell" data-label="Experience" title={applicantSkills}>{truncateText(applicantSkills, 42)}</span>
                         <span className="admin-row-cell" data-label="Forklift">
-                          <span className={`tag ${applicant.forklift_licence ? 'active' : ''}`}>{applicant.forklift_licence ? 'Yes' : 'No'}</span>
+                          <span className={`tag boolean-tag ${applicant.forklift_licence ? 'active yes' : 'no'}`}>{applicant.forklift_licence ? 'Yes' : 'No'}</span>
                         </span>
                         <span className="admin-row-cell" data-label="Status">
-                          <span className={`status-badge ${isExpanded || hasPlacement ? 'active' : ''}`}>{formatStatusLabel(applicant.status)}</span>
+                          <span className={`status-badge status-${applicant.status || 'new'} ${isExpanded || hasPlacement ? 'active' : ''}`}>{formatStatusLabel(applicant.status)}</span>
                         </span>
                         <span className="admin-row-cell" data-label="Placed at">{applicant.placement_site || '—'}</span>
                         <span className="admin-row-cell" data-label="Date">{formatApplicantDate(applicant.created_at)}</span>
@@ -406,7 +406,7 @@ export default function Admin() {
                               </p>
                             </div>
                             <div className="status-row">
-                              <span className="status-badge active">{detailApplicant.status || 'new'}</span>
+                              <span className={`status-badge active status-${detailApplicant.status || 'new'}`}>{formatStatusLabel(detailApplicant.status)}</span>
                               <span className="tag">{renderArea(detailApplicant)}</span>
                               <span className="tag">{detailApplicant.placement_site || 'Unplaced'}</span>
                             </div>

@@ -894,9 +894,45 @@ p {
   padding-bottom: 2rem;
 }
 
+.admin-shell .container {
+  width: min(1420px, calc(100% - 2rem));
+}
+
+.admin-header {
+  align-items: flex-end;
+  padding-top: 1.9rem;
+  padding-bottom: 0.85rem;
+}
+
+.admin-header h1 {
+  font-size: clamp(2rem, 4vw, 2.65rem);
+  letter-spacing: -0.03em;
+  margin-bottom: 0.35rem;
+}
+
+.admin-header .muted {
+  max-width: 48rem;
+}
+
+.admin-stats .stat-card {
+  min-height: 112px;
+  padding: 1.15rem 1.2rem;
+  border-radius: 20px;
+  background: linear-gradient(180deg, rgba(50, 18, 14, 0.98), rgba(29, 10, 9, 0.98));
+  border-color: rgba(230, 126, 34, 0.18);
+}
+
+.admin-stats .stat-card strong {
+  font-size: 1.8rem;
+  letter-spacing: -0.03em;
+}
+
 .admin-toolbar {
   position: relative;
   overflow: hidden;
+  border-radius: 24px;
+  border-color: rgba(230, 126, 34, 0.16);
+  background: linear-gradient(180deg, rgba(47, 17, 13, 0.98), rgba(28, 10, 8, 0.99));
 }
 
 .admin-toolbar::before,
@@ -933,9 +969,18 @@ p {
 }
 
 .admin-search-input {
-  background: rgba(255, 255, 255, 0.03);
-  border-color: rgba(230, 126, 34, 0.25);
+  min-height: 48px;
+  background: rgba(255, 255, 255, 0.035);
+  border-color: rgba(230, 126, 34, 0.2);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+.admin-toolbar select {
+  min-height: 48px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.035);
+  border-color: rgba(230, 126, 34, 0.2);
+  color: #f8ebe4;
 }
 
 .admin-search-input:focus,
@@ -950,7 +995,9 @@ input:focus {
 .admin-toolbar-footer {
   position: relative;
   z-index: 1;
-  margin-top: 1rem;
+  margin-top: 1.15rem;
+  padding-top: 0.95rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
   display: flex;
   gap: 0.9rem;
   justify-content: space-between;
@@ -960,6 +1007,16 @@ input:focus {
 
 .admin-filter-summary {
   gap: 0.6rem;
+}
+
+.admin-filter-summary .tag,
+.admin-hero .tag,
+.admin-hero .status-badge,
+.admin-row-cell .tag,
+.admin-row-cell .status-badge {
+  min-height: 2rem;
+  padding: 0.42rem 0.78rem;
+  border-radius: 999px;
 }
 
 .admin-quick-filters {
@@ -1003,6 +1060,9 @@ input:focus {
 
 .admin-list-panel {
   gap: 1rem;
+  border-radius: 24px;
+  border-color: rgba(230, 126, 34, 0.14);
+  background: linear-gradient(180deg, rgba(45, 16, 13, 0.98), rgba(27, 10, 8, 0.99));
 }
 
 .admin-list-header {
@@ -1023,6 +1083,7 @@ input:focus {
 
 .admin-table-list {
   overflow-x: auto;
+  padding-bottom: 0.25rem;
 }
 
 .admin-table-head,
@@ -1035,11 +1096,15 @@ input:focus {
 }
 
 .admin-table-head {
-  padding: 0 1rem 0.45rem;
-  color: var(--muted);
-  font-size: 0.78rem;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  margin-bottom: 0.2rem;
+  padding: 0.2rem 1rem 0.75rem;
+  color: #b88b79;
+  font-size: 0.74rem;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
 }
 
 .admin-table-head input[type="checkbox"],
@@ -1052,13 +1117,21 @@ input:focus {
 .admin-applicant-card {
   padding: 0;
   overflow: hidden;
+  border-radius: 20px;
+  border-color: rgba(255, 255, 255, 0.04);
+  background: linear-gradient(180deg, rgba(38, 14, 11, 0.99), rgba(26, 10, 8, 0.99));
   transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
 }
 
 .admin-applicant-card:hover {
   transform: translateY(-2px);
   border-color: rgba(230, 126, 34, 0.45);
-  background: linear-gradient(180deg, rgba(52, 18, 13, 0.98), rgba(31, 11, 9, 0.98));
+  background: linear-gradient(180deg, rgba(54, 20, 15, 0.99), rgba(31, 11, 9, 0.99));
+}
+
+.admin-applicant-card.active {
+  border-color: rgba(230, 126, 34, 0.52);
+  box-shadow: 0 0 0 1px rgba(230, 126, 34, 0.18) inset, 0 18px 36px rgba(0, 0, 0, 0.18);
 }
 
 .admin-accordion-trigger {
@@ -1070,7 +1143,7 @@ input:focus {
 }
 
 .admin-table-trigger {
-  padding: 1rem;
+  padding: 1rem 1.1rem;
 }
 
 .admin-accordion-trigger:focus-visible {
@@ -1080,6 +1153,7 @@ input:focus {
 
 .admin-table-row {
   font-size: 0.92rem;
+  min-height: 66px;
 }
 
 .admin-row-cell {
@@ -1087,6 +1161,10 @@ input:focus {
   display: flex;
   align-items: center;
   color: var(--text);
+}
+
+.admin-row-cell:not(.admin-select-cell) {
+  padding-right: 0.25rem;
 }
 
 .admin-select-cell {
@@ -1113,6 +1191,48 @@ input:focus {
   text-transform: uppercase;
 }
 
+.boolean-tag.yes {
+  color: #fff6ef;
+  border-color: rgba(230, 126, 34, 0.42);
+  background: rgba(230, 126, 34, 0.18);
+}
+
+.boolean-tag.no {
+  color: #d7b0a0;
+  border-color: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.status-badge.status-new {
+  color: #ffe5cb;
+  border-color: rgba(230, 126, 34, 0.34);
+  background: rgba(230, 126, 34, 0.12);
+}
+
+.status-badge.status-reviewed {
+  color: #f7d6c7;
+  border-color: rgba(184, 124, 106, 0.36);
+  background: rgba(184, 124, 106, 0.14);
+}
+
+.status-badge.status-shortlisted {
+  color: #fff0e6;
+  border-color: rgba(214, 92, 45, 0.46);
+  background: rgba(214, 92, 45, 0.18);
+}
+
+.status-badge.status-placed {
+  color: #fff6ef;
+  border-color: rgba(230, 126, 34, 0.5);
+  background: rgba(230, 126, 34, 0.2);
+}
+
+.status-badge.status-rejected {
+  color: #e8b7b0;
+  border-color: rgba(139, 68, 60, 0.4);
+  background: rgba(139, 68, 60, 0.18);
+}
+
 .admin-name-cell,
 .admin-action-cell {
   font-weight: 700;
@@ -1131,6 +1251,7 @@ input:focus {
 .admin-accordion-content {
   padding: 0 1.15rem 1.15rem;
   border-top: 1px solid rgba(230, 126, 34, 0.16);
+  background: linear-gradient(180deg, rgba(40, 15, 12, 0.94), rgba(25, 9, 8, 0.98));
 }
 
 .admin-list-item {
@@ -1170,8 +1291,10 @@ input:focus {
 }
 
 .admin-hero {
-  padding: 1.35rem;
-  border-color: rgba(230, 126, 34, 0.22);
+  padding: 1.45rem;
+  border-radius: 20px;
+  border-color: rgba(230, 126, 34, 0.2);
+  background: linear-gradient(180deg, rgba(49, 18, 14, 0.98), rgba(28, 11, 9, 0.99));
 }
 
 .admin-hero-top {
@@ -1195,6 +1318,12 @@ input:focus {
   border-radius: 16px;
   padding: 0.9rem 1rem;
   background: rgba(255, 255, 255, 0.025);
+}
+
+.summary-panel {
+  border-radius: 20px;
+  border-color: rgba(255, 255, 255, 0.05);
+  background: linear-gradient(180deg, rgba(43, 15, 12, 0.98), rgba(26, 10, 9, 0.98));
 }
 
 .mini-stat strong {
