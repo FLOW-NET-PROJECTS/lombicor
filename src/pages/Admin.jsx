@@ -17,10 +17,14 @@ export default function Admin() {
   const [adminNotes, setAdminNotes] = useState('')
   const [status, setStatus] = useState('new')
   const [placement, setPlacement] = useState('')
+  const [selectedIds, setSelectedIds] = useState([])
   const [searchQuery, setSearchQuery] = useState('')
+  const [experienceFilter, setExperienceFilter] = useState('all')
   const [statusFilter, setStatusFilter] = useState('all')
   const [areaFilter, setAreaFilter] = useState('all')
-  const [placementFilter, setPlacementFilter] = useState('all')
+  const [forkliftFilter, setForkliftFilter] = useState('all')
+  const [genderFilter, setGenderFilter] = useState('all')
+  const [raceFilter, setRaceFilter] = useState('all')
   const [sortBy, setSortBy] = useState('newest')
 
   function syncExpandedDrafts(applicant) {
@@ -63,14 +67,42 @@ export default function Admin() {
     loadApplicants()
   }, [])
 
+  useEffect(() => {
+    setSelectedIds((current) => current.filter((id) => applicants.some((applicant) => applicant.id === id)))
+  }, [applicants])
+
+  const experienceOptions = useMemo(() => {
+    const values = new Set(options.skills || [])
+    applicants.forEach((applicant) => {
+      extractSkillLabels(applicant).forEach((skill) => values.add(skill))
+    })
+    return [...values].filter(Boolean)
+  }, [applicants, options.skills])
+
+  const genderOptions = useMemo(
+    () => [...new Set(applicants.map((applicant) => applicant.gender).filter(Boolean))],
+    [applicants],
+  )
+
+  const raceOptions = useMemo(
+    () => [...new Set(applicants.map((applicant) => applicant.race).filter(Boolean))],
+    [applicants],
+  )
+
   const filteredApplicants = useMemo(() => {
     const query = searchQuery.trim().toLowerCase()
     const next = applicants.filter((applicant) => {
       const matchesQuery = !query || buildSearchText(applicant).includes(query)
+      const applicantSkills = extractSkillLabels(applicant)
+      const matchesExperience = experienceFilter === 'all' || applicantSkills.includes(experienceFilter)
       const matchesStatus = statusFilter === 'all' || (applicant.status || 'new') === statusFilter
       const matchesArea = areaFilter === 'all' || renderArea(applicant) === areaFilter
-      const matchesPlacement = placementFilter === 'all' || (applicant.placement_site || 'Unplaced') === placementFilter
-      return matchesQuery && matchesStatus && matchesArea && matchesPlacement
+      const matchesForklift =
+        forkliftFilter === 'all' ||
+        (forkliftFilter === 'yes' ? applicant.forklift_licence : !applicant.forklift_licence)
+      const matchesGender = genderFilter === 'all' || (applicant.gender || '') === genderFilter
+      const matchesRace = raceFilter === 'all' || (applicant.race || '') === raceFilter
+      return matchesQuery && matchesExperience && matchesStatus && matchesArea && matchesForklift && matchesGender && matchesRace
     })
 
     next.sort((left, right) => {
@@ -87,7 +119,9 @@ export default function Admin() {
     })
 
     return next
-  }, [applicants, searchQuery, statusFilter, areaFilter, placementFilter, sortBy])
+  }, [applicants, searchQuery, experienceFilter, statusFilter, areaFilter, forkliftFilter, genderFilter, raceFilter, sortBy])
+
+  const allVisibleSelected = filteredApplicants.length > 0 && filteredApplicants.every((applicant) => selectedIds.includes(applicant.id))
 
   useEffect(() => {
     if (loading || !expandedId) return
@@ -149,10 +183,26 @@ export default function Admin() {
 
   function clearFilters() {
     setSearchQuery('')
+    setExperienceFilter('all')
     setStatusFilter('all')
     setAreaFilter('all')
-    setPlacementFilter('all')
+    setForkliftFilter('all')
+    setGenderFilter('all')
+    setRaceFilter('all')
     setSortBy('newest')
+  }
+
+  function toggleSelected(id) {
+    setSelectedIds((current) => (current.includes(id) ? current.filter((item) => item !== id) : [...current, id]))
+  }
+
+  function toggleAllVisible() {
+    if (allVisibleSelected) {
+      setSelectedIds((current) => current.filter((id) => !filteredApplicants.some((applicant) => applicant.id === id)))
+      return
+    }
+
+    setSelectedIds((current) => [...new Set([...current, ...filteredApplicants.map((applicant) => applicant.id)])])
   }
 
   return (
@@ -187,50 +237,62 @@ export default function Admin() {
         <div className="panel admin-toolbar" style={{ marginBottom: '1rem' }}>
           <div className="admin-toolbar-grid">
             <div className="admin-search-block">
-              <label className="form-label">Search applications</label>
               <input
                 className="admin-search-input"
                 value={searchQuery}
                 onChange={(event) => setSearchQuery(event.target.value)}
-                placeholder="Name, SA ID, phone, ref, area, skill, status, placement"
+                placeholder="Search name, ID, phone, area, ref..."
               />
             </div>
             <div>
-              <label className="form-label">Status</label>
-              <select value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)}>
-                <option value="all">All statuses</option>
-                {options.statuses.map((option) => (
+              <select value={experienceFilter} onChange={(event) => setExperienceFilter(event.target.value)}>
+                <option value="all">All Experience</option>
+                {experienceOptions.map((option) => (
                   <option key={option} value={option}>{option}</option>
                 ))}
               </select>
             </div>
             <div>
-              <label className="form-label">Area</label>
               <select value={areaFilter} onChange={(event) => setAreaFilter(event.target.value)}>
-                <option value="all">All areas</option>
+                <option value="all">All Areas</option>
                 {options.areas.map((option) => (
                   <option key={option} value={option}>{option}</option>
                 ))}
               </select>
             </div>
             <div>
-              <label className="form-label">Placement</label>
-              <select value={placementFilter} onChange={(event) => setPlacementFilter(event.target.value)}>
-                <option value="all">All placement states</option>
-                <option value="Unplaced">Unplaced</option>
-                {options.placements.map((option) => (
+              <select value={forkliftFilter} onChange={(event) => setForkliftFilter(event.target.value)}>
+                <option value="all">All Forklift</option>
+                <option value="yes">Forklift Yes</option>
+                <option value="no">Forklift No</option>
+              </select>
+            </div>
+            <div>
+              <select value={genderFilter} onChange={(event) => setGenderFilter(event.target.value)}>
+                <option value="all">All Genders</option>
+                {genderOptions.map((option) => (
                   <option key={option} value={option}>{option}</option>
                 ))}
               </select>
             </div>
             <div>
-              <label className="form-label">Sort</label>
-              <select value={sortBy} onChange={(event) => setSortBy(event.target.value)}>
-                <option value="newest">Newest first</option>
-                <option value="oldest">Oldest first</option>
-                <option value="name-asc">Name A-Z</option>
-                <option value="status">Status</option>
+              <select value={raceFilter} onChange={(event) => setRaceFilter(event.target.value)}>
+                <option value="all">All Races</option>
+                {raceOptions.map((option) => (
+                  <option key={option} value={option}>{renderRaceLabel(option)}</option>
+                ))}
               </select>
+            </div>
+            <div>
+              <select value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)}>
+                <option value="all">All Statuses</option>
+                {options.statuses.map((option) => (
+                  <option key={option} value={option}>{formatStatusLabel(option)}</option>
+                ))}
+              </select>
+            </div>
+            <div className="admin-filter-action">
+              <button className="btn btn-ghost btn-small admin-clear-button" type="button" onClick={clearFilters}>Clear</button>
             </div>
           </div>
           <div className="admin-toolbar-footer">
@@ -238,13 +300,12 @@ export default function Admin() {
               <span className="tag active">{stats.filtered} match{stats.filtered === 1 ? '' : 'es'}</span>
               <span className="tag">{filteredApplicants.filter((item) => item.status === 'shortlisted').length} shortlisted</span>
               <span className="tag">{filteredApplicants.filter((item) => item.placement_site).length} placed</span>
+              <span className="tag">{selectedIds.length} selected</span>
             </div>
-            <div className="admin-quick-filters">
-              <button className="tag tag-button" type="button" onClick={() => setStatusFilter('new')}>New</button>
-              <button className="tag tag-button" type="button" onClick={() => setStatusFilter('shortlisted')}>Shortlisted</button>
-              <button className="tag tag-button" type="button" onClick={() => setStatusFilter('placed')}>Placed</button>
-              <button className="tag tag-button" type="button" onClick={() => setPlacementFilter('Unplaced')}>Unplaced</button>
-              <button className="btn btn-ghost btn-small" type="button" onClick={clearFilters}>Clear filters</button>
+            <div className="admin-quick-filters admin-results-note">
+              <span className="muted small">
+                Showing {filteredApplicants.length === 0 ? 0 : 1}-{filteredApplicants.length} of {stats.total} results
+              </span>
             </div>
           </div>
         </div>
@@ -263,7 +324,10 @@ export default function Admin() {
 
           {!loading && filteredApplicants.length > 0 && (
             <div className="admin-accordion-list admin-table-list">
-              <div className="admin-table-head" aria-hidden="true">
+              <div className="admin-table-head">
+                <span>
+                  <input type="checkbox" checked={allVisibleSelected} onChange={toggleAllVisible} />
+                </span>
                 <span>Ref</span>
                 <span>Name</span>
                 <span>ID number</span>
@@ -296,6 +360,14 @@ export default function Admin() {
                       aria-expanded={isExpanded}
                     >
                       <div className="admin-table-row">
+                        <span className="admin-row-cell admin-select-cell" data-label="Select">
+                          <input
+                            type="checkbox"
+                            checked={selectedIds.includes(applicant.id)}
+                            onChange={() => toggleSelected(applicant.id)}
+                            onClick={(event) => event.stopPropagation()}
+                          />
+                        </span>
                         <span className="admin-row-cell admin-ref-cell" data-label="Ref">
                           <span className="admin-ref-code">{applicant.ref_id}</span>
                         </span>
@@ -471,9 +543,13 @@ function renderArea(applicant) {
 }
 
 function renderSkills(applicant) {
-  const skills = Array.isArray(applicant.skills) ? applicant.skills : []
-  const filled = applicant.skills_other ? [...skills.filter((item) => item !== 'Other'), applicant.skills_other] : skills
+  const filled = extractSkillLabels(applicant)
   return filled.length ? filled.join(', ') : 'None saved'
+}
+
+function extractSkillLabels(applicant) {
+  const skills = Array.isArray(applicant.skills) ? applicant.skills : []
+  return applicant.skills_other ? [...skills.filter((item) => item !== 'Other'), applicant.skills_other] : skills
 }
 
 function renderRaceLabel(race) {
