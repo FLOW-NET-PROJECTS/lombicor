@@ -47,7 +47,7 @@ const supabase = HAS_SUPABASE
 const AREA_OPTIONS = ['Uitenhage', 'Kirkwood', 'Addo', 'Other']
 const STATUS_OPTIONS = ['new', 'reviewed', 'shortlisted', 'placed', 'rejected']
 const PLACEMENT_OPTIONS = ['Unifrutti', 'Greenco Day', 'Greenco Night', 'Freshco', 'Golden Ridge']
-const SKILL_OPTIONS = ['Packer', 'Picker', 'Forklift Driver', 'General Worker', 'Quality Checker', 'Other']
+const SKILL_OPTIONS = ['Packer', 'Sorter', 'Pre Sorter', 'Palletizer', 'Strapper', 'General Worker/Cleaner', 'Forklift Driver', 'Other']
 
 app.use(express.json({ limit: '10mb' }))
 app.use(express.urlencoded({ extended: true }))

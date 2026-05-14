@@ -76,7 +76,7 @@ export default function Apply() {
       .catch(() => {
         setOptions({
           areas: ['Uitenhage', 'Kirkwood', 'Addo', 'Other'],
-          skills: ['Packer', 'Picker', 'Forklift Driver', 'General Worker', 'Quality Checker', 'Other'],
+          skills: ['Packer', 'Sorter', 'Pre Sorter', 'Palletizer', 'Strapper', 'General Worker/Cleaner', 'Forklift Driver', 'Other'],
         })
       })
   }, [])

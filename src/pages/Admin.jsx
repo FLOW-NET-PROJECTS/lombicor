@@ -253,7 +253,7 @@ export default function Admin() {
           <div className="admin-list-header">
             <div>
               <h2 style={{ marginBottom: '0.2rem' }}>Applicants</h2>
-              <p className="muted small" style={{ marginBottom: 0 }}>Expand an applicant to view the full form, documents, and admin controls.</p>
+              <p className="muted small" style={{ marginBottom: 0 }}>A wider row layout makes it easier to scan applications quickly, then open one for full details.</p>
             </div>
           </div>
 
@@ -262,7 +262,23 @@ export default function Admin() {
           {!loading && applicants.length > 0 && filteredApplicants.length === 0 && <p className="muted">No applications match the current filters.</p>}
 
           {!loading && filteredApplicants.length > 0 && (
-            <div className="admin-accordion-list">
+            <div className="admin-accordion-list admin-table-list">
+              <div className="admin-table-head" aria-hidden="true">
+                <span>Ref</span>
+                <span>Name</span>
+                <span>ID number</span>
+                <span>Area</span>
+                <span>Gender</span>
+                <span>Race</span>
+                <span>Contact</span>
+                <span>Experience</span>
+                <span>Forklift</span>
+                <span>Status</span>
+                <span>Placed at</span>
+                <span>Date</span>
+                <span>Action</span>
+              </div>
+
               {filteredApplicants.map((applicant) => {
                 const applicantSkills = renderSkills(applicant)
                 const hasPlacement = Boolean(applicant.placement_site)
@@ -274,29 +290,35 @@ export default function Admin() {
                 return (
                   <article key={applicant.id} className={`list-item admin-applicant-card ${isExpanded ? 'active' : ''}`}>
                     <button
-                      className="admin-accordion-trigger"
+                      className="admin-accordion-trigger admin-table-trigger"
                       type="button"
                       onClick={() => handleToggleApplicant(applicant)}
                       aria-expanded={isExpanded}
                     >
-                      <div className="admin-accordion-main">
-                        <div className="list-item-header">
+                      <div className="admin-table-row">
+                        <span className="admin-row-cell admin-ref-cell" data-label="Ref">
+                          <span className="admin-ref-code">{applicant.ref_id}</span>
+                        </span>
+                        <span className="admin-row-cell admin-name-cell" data-label="Name">
                           <strong>{applicant.first_name} {applicant.surname}</strong>
-                          <span className={`status-badge ${isExpanded ? 'active' : ''}`}>{applicant.status || 'new'}</span>
-                        </div>
-                        <div className="admin-accordion-meta">
-                          <span className="admin-meta-pill">Ref {applicant.ref_id}</span>
-                          <span className="admin-meta-pill">{renderArea(applicant)}</span>
-                          <span className={`admin-meta-pill ${hasPlacement ? 'highlight' : ''}`}>{hasPlacement ? 'Placed' : 'Not placed'}</span>
-                        </div>
-                        <div className="list-meta">{truncateText(applicantSkills, 72)}</div>
-                      </div>
-
-                      <div className="admin-accordion-side">
-                        {hasPlacement && <span className="tag active">{applicant.placement_site}</span>}
-                        {applicant.packhouse_experience && <span className="tag">Packhouse</span>}
-                        {applicant.forklift_licence && <span className="tag">Forklift</span>}
-                        <span className="accordion-toggle-label">{isExpanded ? 'Hide details' : 'Open details'}</span>
+                        </span>
+                        <span className="admin-row-cell" data-label="ID number">{applicant.id_number || '—'}</span>
+                        <span className="admin-row-cell" data-label="Area">{renderArea(applicant)}</span>
+                        <span className="admin-row-cell" data-label="Gender">{applicant.gender || '—'}</span>
+                        <span className="admin-row-cell" data-label="Race">{renderRaceLabel(applicant.race)}</span>
+                        <span className="admin-row-cell" data-label="Contact">{applicant.contact_number || '—'}</span>
+                        <span className="admin-row-cell" data-label="Experience" title={applicantSkills}>{truncateText(applicantSkills, 42)}</span>
+                        <span className="admin-row-cell" data-label="Forklift">
+                          <span className={`tag ${applicant.forklift_licence ? 'active' : ''}`}>{applicant.forklift_licence ? 'Yes' : 'No'}</span>
+                        </span>
+                        <span className="admin-row-cell" data-label="Status">
+                          <span className={`status-badge ${isExpanded || hasPlacement ? 'active' : ''}`}>{formatStatusLabel(applicant.status)}</span>
+                        </span>
+                        <span className="admin-row-cell" data-label="Placed at">{applicant.placement_site || '—'}</span>
+                        <span className="admin-row-cell" data-label="Date">{formatApplicantDate(applicant.created_at)}</span>
+                        <span className="admin-row-cell admin-action-cell" data-label="Action">
+                          <span className="accordion-toggle-label">{isExpanded ? 'Hide' : 'View'}</span>
+                        </span>
                       </div>
                     </button>
 
@@ -454,6 +476,30 @@ function renderSkills(applicant) {
   return filled.length ? filled.join(', ') : 'None saved'
 }
 
+function renderRaceLabel(race) {
+  if (!race) return '—'
+  if (race === 'African') return 'African / Black'
+  return race
+}
+
+function formatStatusLabel(status) {
+  if (!status) return 'New'
+  return status.charAt(0).toUpperCase() + status.slice(1)
+}
+
+function formatApplicantDate(value) {
+  if (!value) return '—'
+
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) return '—'
+
+  return new Intl.DateTimeFormat('en-ZA', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+  }).format(date)
+}
+
 function buildSearchText(applicant) {
   return [
     applicant.first_name,
@@ -465,6 +511,8 @@ function buildSearchText(applicant) {
     applicant.area_other,
     applicant.status,
     applicant.placement_site,
+    applicant.gender,
+    applicant.race,
     renderSkills(applicant),
   ]
     .filter(Boolean)
